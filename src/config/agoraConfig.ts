@@ -5,6 +5,8 @@
  * Store it securely on your server and generate tokens server-side.
  */
 
+import { fetchTokenFromServer } from '../utils/generateToken';
+
 export const agoraConfig = {
     // Your Agora App ID
     appId: 'c2d8d080312d4991b6aff93dcf365ec1',
@@ -18,19 +20,61 @@ export const agoraConfig = {
 };
 
 /**
- * Generate a token for testing
+ * Generate a token dynamically for any channel name
  * 
- * For production, generate tokens on your server for security.
+ * SETUP OPTIONS:
  * 
- * To get a temporary token for testing:
- * 1. Go to Agora Console → Your Project → Temporary Token
- * 2. Enter channel name and UID
- * 3. Copy the generated token
- * 4. Use it in the joinAgoraChannel function
+ * Option 1 (Recommended): Use your own server
+ * - Set SERVER_URL below to your server endpoint
+ * - See server-example/ folder for a simple Node.js server
+ * 
+ * Option 2: Disable token authentication in Agora Console
+ * - Go to Agora Console → Your Project → Security
+ * - Disable token authentication (for testing only)
+ * - Then this function can return empty string
  */
-export const getTestToken = (channelName: string, uid: number = 0): string => {
-    // For testing, you can paste a temporary token here
-    // Get it from: Agora Console → Your Project → Temporary Token
-    return '007eJxTYPii0hP4dK4hVy7jDt8l3FnrtP/Irjgv9UTHWupvt+g58ygFhmSjFIsUAwsDY0OjFBNLS8Mks8S0NEvjlOQ0YzPT1GTDrvMhmQ2BjAznPN4yMTJAIIjPw1CSWlyim5yRmJeXmsPAAAD18iHr';
+export const getTestToken = async (channelName: string, uid: number = 0): Promise<string> => {
+    // ============================================
+    // OPTION 1: Use your own token server (RECOMMENDED)
+    // ============================================
+    // Uncomment and set your server URL:
+    const SERVER_URL = 'http://192.168.69.22:3000'; // Change to your server URL
+    // For production, use: 'https://your-server.com'
+
+    try {
+        const serverToken = await fetchTokenFromServer(channelName, uid, SERVER_URL);
+        if (serverToken) {
+            console.log('Token fetched from server successfully');
+            return serverToken;
+        }
+    } catch (error) {
+        console.warn('Server token fetch failed:', error);
+        // Continue to try other options
+    }
+
+    // ============================================
+    // OPTION 2: Return empty (if token auth is disabled)
+    // ============================================
+    // If you disabled token authentication in Agora Console,
+    // you can return empty string here
+    console.warn('No server configured. Using empty token. Make sure token auth is disabled in Agora Console for testing.');
+    return '';
+};
+
+/**
+ * Generate token using Agora's REST API
+ * Note: This requires your App Certificate to be kept secure
+ * For production, always generate tokens on your server
+ */
+const generateTokenViaAgoraAPI = async (
+    channelName: string,
+    uid: number
+): Promise<string> => {
+    // Agora doesn't provide a direct REST API for token generation
+    // You need to use their token generator library on a server
+    // Or use their online tool: https://www.agora.io/en/blog/token-generator/
+
+    // For now, return empty and recommend server-side generation
+    return '';
 };
 

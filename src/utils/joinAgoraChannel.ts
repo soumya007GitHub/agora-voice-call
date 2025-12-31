@@ -1,6 +1,7 @@
 import { IRtcEngine } from 'react-native-agora';
 import { ChannelProfileType, ClientRoleType } from 'react-native-agora';
 import { getTestToken } from '../config/agoraConfig';
+import { fetchTokenFromServer } from './generateToken';
 
 /**
  * Join a Channel for Video or Voice Calls
@@ -16,21 +17,27 @@ export const joinAgoraChannel = async (
     try {
         // Use 0 to let Agora auto-assign UID, or use a unique number for each user
         const uid = 0;
-        
-        // Get token - for testing, use getTestToken() or paste a temporary token
-        // For production, fetch token from your server
-        let token = getTestToken(channelName, uid);
-        
-        // If token is empty, try to get from environment or use empty (will fail if token auth is required)
+
+        // Generate token dynamically for the channel name
+        showMessage('Generating token for channel: ' + channelName);
+
+        // Try to get token from server first (if configured)
+        let token = await fetchTokenFromServer(channelName, uid);
+
+        // If no server token, try to generate using config function
         if (!token) {
-            // You can also set a temporary token directly here for testing:
-            // token = 'YOUR_TEMPORARY_TOKEN_HERE';
-            token = '';
+            token = await getTestToken(channelName, uid);
         }
-        
+
+        // If still no token, show warning
         if (!token) {
-            console.warn('No token provided. If token authentication is enabled, this will fail.');
-            showMessage('Warning: No token provided. Getting token from Agora Console...');
+            console.warn('No token generated. Token authentication may be required.');
+            showMessage('⚠️ No token available. Check if token auth is enabled in Agora Console.');
+            // For testing: You might need to disable token auth or set up a server
+            // For now, try with empty token (may work if token auth is optional)
+            token = '';
+        } else {
+            showMessage('✅ Token generated successfully');
         }
 
         const agoraEngine = agoraEngineRef.current;

@@ -24,7 +24,7 @@ export const initializeAgoraEngine = async (
         // Initialize Agora Engine first
         const initResult = agoraEngine.initialize({ appId: agoraConfig.appId });
         console.log('Agora engine initialized:', initResult);
-        
+
         if (initResult !== 0) {
             showMessage(`Warning: Engine initialization returned code: ${initResult}`);
         }
@@ -54,7 +54,7 @@ export const initializeAgoraEngine = async (
             onError: (err, msg) => {
                 console.error('Agora error:', err, msg);
                 let errorMsg = `Error ${err}: ${msg}`;
-                
+
                 // Common error codes
                 if (err === 110) {
                     errorMsg = `Error ${err}: Invalid App ID or Token. Check your Agora App ID configuration.`;
@@ -63,18 +63,19 @@ export const initializeAgoraEngine = async (
                 } else if (err === 109) {
                     errorMsg = `Error ${err}: Token expired or invalid.`;
                 }
-                
+
                 showMessage(errorMsg);
             },
-            onConnectionStateChanged: (state, reason) => {
+            onConnectionStateChanged: (state: any, reason: any) => {
                 console.log('Connection state changed:', state, reason);
-                if (state === 5) { // DISCONNECTED
+                const stateValue = typeof state === 'object' ? (state as any).state : state;
+                if (stateValue === 5) { // DISCONNECTED
                     showMessage('Connection lost. Reason: ' + reason);
-                } else if (state === 3) { // RECONNECTING
+                } else if (stateValue === 3) { // RECONNECTING
                     showMessage('Reconnecting...');
-                } else if (state === 1) { // CONNECTING
+                } else if (stateValue === 1) { // CONNECTING
                     showMessage('Connecting...');
-                } else if (state === 2) { // CONNECTED
+                } else if (stateValue === 2) { // CONNECTED
                     showMessage('Connected to Agora');
                 }
             },
