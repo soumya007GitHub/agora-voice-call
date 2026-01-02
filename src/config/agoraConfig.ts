@@ -9,11 +9,11 @@ import { fetchTokenFromServer } from '../utils/generateToken';
 
 export const agoraConfig = {
     // Your Agora App ID
-    appId: 'c2d8d080312d4991b6aff93dcf365ec1',
+    appId: '',
 
     // Your Agora App Certificate (needed for token generation)
     // Get this from: Agora Console → Your Project → App Certificate
-    appCertificate: '9f257884b0db45ab97d047fcff309a2f',
+    appCertificate: '',
 
     // Token expiration time in seconds (24 hours = 86400)
     tokenExpirationTime: 86400,
@@ -38,7 +38,7 @@ export const getTestToken = async (channelName: string, uid: number = 0): Promis
     // OPTION 1: Use your own token server (RECOMMENDED)
     // ============================================
     // Uncomment and set your server URL:
-    const SERVER_URL = 'http://192.168.69.22:3000'; // Change to your server URL
+    const SERVER_URL = ''; // Change to your server URL
     // For production, use: 'https://your-server.com'
 
     try {
